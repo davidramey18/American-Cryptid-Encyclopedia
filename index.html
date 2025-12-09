@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>American Cryptid Encyclopedia — Click a State</title>
+
+<!-- Early 2000s vibes + simple responsive layout -->
+<style>
+  body{
+    margin:0;
+    font-family: "Trebuchet MS", Arial, sans-serif;
+    background: linear-gradient(#001022, #000011);
+    color: #ccf8ff;
+    -webkit-text-size-adjust: none;
+  }
+  header{
+    text-align:center;
+    background: linear-gradient(#001133,#000022);
+    border-bottom:4px ridge #0099cc;
+    padding:22px 10px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+  }
+  header h1{
+    margin:0;
+    font-size:34px;
+    color:#99eeff;
+    text-shadow:0 0 8px #00ddff;
+    letter-spacing:1px;
+  }
+  header p{margin:6px 0 0; color:#bfeeff; opacity:0.9}
+
+  .wrap{
+    max-width:1100px;
+    margin:22px auto;
+    padding:18px;
+    background: rgba(0,10,20,0.55);
+    border:3px groove #004455;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap:8px;
+  }
+
+  /* state tile */
+  .state {
+    background: linear-gradient(180deg,#003344,#002233);
+    border:2px outset #006688;
+    padding:12px;
+    text-align:center;
+    cursor:pointer;
+    user-select:none;
+    transition: transform .12s ease, box-shadow .12s ease;
+    position:relative;
+  }
+  .state:hover{ transform: translateY(-4px); box-shadow:0 8px 18px rgba(0,0,0,0.6); }
+  .abbr{ font-weight:800; font-size:16px; color:#eaffff; text-shadow:0 0 6px #00c2ff }
+  .stname{ font-size:11px; color:#bfeeff; display:block; margin-top:6px }
+
+  /* selected highlight */
+  .state.active{ border-color:#ffd966; box-shadow: 0 0 18px rgba(255,200,90,0.12); transform: translateY(-6px) scale(1.02); }
+
+  /* details area */
+  .detail{
+    margin-top:18px;
+    padding:16px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.2));
+    border:2px groove #005577;
+    border-radius:6px;
+  }
+  .cryptid-title{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .cryptid-title h2{ margin:0; font-size:22px; color:#ffd27a; text-shadow:0 0 6px #ffb84d }
+  .meta{ color:#cfeff6; margin-top:6px; font-size:13px }
+  .desc{ margin-top:12px; color:#e7fbff; line-height:1.45; text-shadow:0 0 2px rgba(0,0,0,0.6) }
+
+  /* responsive */
+  @media (max-width:900px){
+    .grid{ grid-template-columns: repeat(5, 1fr); }
+  }
+  @media (max-width:560px){
+    .grid{ grid-template-columns: repeat(3, 1fr); }
+    header h1{ font-size:22px }
+  }
+
+  /* small retro footer */
+  footer{ text-align:center; margin-top:16px; color:#99dbff; font-size:12px }
+  .note{ color:#cfeeff; font-size:13px; margin-top:10px }
+</style>
+</head>
+<body>
+<header>
+  <h1>American Cryptid Encyclopedia</h1>
+  <p>Click any state to reveal its most popular cryptid — early-2000s style descriptions. California → Fresno Nightcrawler.</p>
+</header>
+
+<div class="wrap">
+  <div class="note">Tip: Use keyboard to focus state tiles and press Enter. This single page works great on GitHub Pages — just upload as <code>index.html</code>.</div>
+
+  <!-- grid of 50 state tiles -->
+  <div id="grid" class="grid" aria-label="US states clickable grid"></div>
+
+  <div id="detail" class="detail" role="region" aria-live="polite">
+    <div class="cryptid-title">
+      <h2>Welcome, Investigator 👁️</h2>
+    </div>
+    <div class="meta">Choose a state from above to read about its most popular cryptid.</div>
+    <div class="desc" style="margin-top:10px">This site is a single static page — copy it into <code>index.html</code> and drop it into a GitHub repository for Pages hosting. All text below is original and written for your American state cryptid project.</div>
+  </div>
+
+  <footer>
+    <div style="margin-top:14px">Made with ☕ and late-night folklore research • 2000s vibes enabled</div>
+  </footer>
+</div>
+
+<script>
+/* ---------- Data: most-popular cryptid per state with longer descriptions ---------- */
+const cryptids = {
+  "Alabama": {
+    name: "White Thang",
+    region: "Northern Alabama woods",
+    short: "Tall, pale, long-haired creature with a terrible scream.",
+    desc: "The White Thang is a folkloric giant of the Alabama hollows — a towering, almost spectral figure described as draped in long white hair and often heard before it is seen. Witnesses across decades report a blood-curdling scream that echoes down ridgelines on humid summer nights, and footprints that suggest something long-legged and heavy. Locals argue over whether it’s a misidentified bear, a spirit guardian of old homesteads, or a truly unknown hominid; the stories that persist make it part ghost, part cautionary tale for those who wander after dark.",
+    more: "Reports vary from a creature lumbering through underbrush to a lithe shape moving with surprising speed. It tends to be associated with places where the forest presses close to farms — a liminal thing between cultivated land and deep woods."
+  },
+
+  "Alaska": {
+    name: "Kushtaka",
+    region: "Southeast Alaska",
+    short: "Shapeshifting otter-people from Tlingit lore.",
+    desc: "Kushtaka, literally the ‘land otter people’, are legendary shapeshifters who feature in Tlingit and Tsimshian storytelling. They may appear as ordinary humans, as otters, or as unsettling hybrids — and are said to lure travelers with cries imitating loved ones or to rescue and then transform those who are lost. Tales describe Kushtaka as tricksters with ambiguous motives: sometimes helpful, sometimes deadly, but always uncanny in their mimicry of human sounds and behavior.",
+    more: "Traditional accounts warn travelers to avoid answering strange cries at night near rivers; modern witnesses sometimes report eerie interactions on isolated roads and shorelines during foggy weather."
+  },
+
+  "Arizona": {
+    name: "Mogollon Monster",
+    region: "Mogollon Rim and surrounding highlands",
+    short: "A desert Bigfoot with glowing eyes and an overpowering stench.",
+    desc: "The Mogollon Monster is Arizona’s hot-country answer to Bigfoot: a large, bipedal, hairy creature seen along the Mogollon Rim and in canyonlands. Descriptions emphasize a foul odor, glowing eyes, and an ability to cross rough cliff faces with ease. Campers speak of stolen food, rocks hurled near tents, and the feeling of being watched after sunset.",
+    more: "Some researchers place the Monster in the realm of regional misidentifications of known animals; others point to multiple independent eyewitness reports and the creature’s recurring place in local folklore as evidence of something more mysterious."
+  },
+
+  "Arkansas": {
+    name: "Fouke Monster",
+    region: "Boggy Creek / Fouke, Arkansas",
+    short: "Swamp-dwelling, hairy biped made famous by a cult film.",
+    desc: "The Fouke Monster lurks in thick bayous and cypress swamps, famous since the 1970s movie The Legend of Boggy Creek popularized local sightings. Witnesses insist it’s a large biped — sometimes described as 7–8 feet tall — with glowing red eyes and a pungent musk. Its presence is woven into community memory: missing livestock, odd noises, and the occasional shredded fence are commonly blamed on this shadowy resident of the swamps.",
+    more: "Despite hoaxes and skepticism, the Fouke Monster remains central to local tourism and lore; summer fright festivals and guide tales keep the legend alive for new generations."
+  },
+
+  "California": {
+    name: "Fresno Nightcrawler",
+    region: "Fresno / central California",
+    short: "Two long, walking legs with no visible torso — caught on security cams.",
+    desc: "The Fresno Nightcrawler is an image that lodged itself in the modern imagination: thin, tapering legs that stride across parking lots and yards as if the air itself were fabric. First widely noticed in early 2000s security footage from Fresno, the creature’s minimal silhouette — long spindly legs, an almost featureless upper part — is both eerie and strangely elegant. It walks in a glide-like manner, seeming to ignore obstacles and move with a softness that belies the alien quality of its appearance.",
+    more: "Without any physical evidence, the Nightcrawler lives in video anomalies, late-night forums, and the imaginations of those who like the idea of a being that’s as much visual riddle as animal: perfectly suited to an era obsessed with home cameras and grainy footage."
+  },
+
+  "Colorado": {
+    name: "Slide-Rock Bolter",
+    region: "High alpine slopes / slide areas",
+    short: "A mountain behemoth that supposedly tumbles down slopes to ambush prey.",
+    desc: "Tales from Colorado’s high country speak of the Slide-Rock Bolter, a monstrous, lumbering presence that uses landslides and rockfalls to move and hunt. Witnesses describe a massive mouth or maw that snaps at anything in its path as it bores down slopes, leaving behind smears of broken timber and odd gouges in the earth. While many interpret the stories as exaggerated accounts of rockfalls and mountain predators, the Bolter functions in local storytelling as a reminder that the alpine environment can be sudden, violent, and unknowable.",
+    more: "Skeptics read Bolter stories as allegory for natural danger; believers point to recurring patterns of footprints and vegetation damage left in the aftermath of mysterious slides."
+  },
+
+  "Connecticut": {
+    name: "Melon Heads",
+    region: "Rural enclaves / small woodlots",
+    short: "Small, pale, deformed humanoids with large heads said to avoid sunlight.",
+    desc: "Melon Heads are a patchwork of cautionary tales: small, nocturnal humanoids living in abandoned cabins, rumored to have large, bulbous skulls and sharp teeth. In some versions they are cast-outs of medical experiments; in others they are children left to fend for themselves and driven feral. Local legends say they prefer the dark and the quiet, emerging only to snatch pets or terrified trespassers who wander too close to their hidden hollows.",
+    more: "The stories often double as community folklore that keeps kids away from abandoned properties; despite that, a handful of alleged sightings — fleeting glimpses on lonely roads — continue to fuel the myth."
+  },
+
+  "Delaware": {
+    name: "Selbyville Swamp Monster",
+    region: "Selbyville swamps",
+    short: "A watery, glowing-eyed humanoid of marsh and reed.",
+    desc: "The Selbyville Swamp Monster moves like a shadow through reeds — a humanoid silhouette with reflective eyes and a wet, musky odor. Fishermen talk of splashes and low groans after midnight; drivers report a shape crossing low causeways and disappearing into marsh fog. The creature is often indistinct, a cluster of impressions rather than a clear picture, which makes it perfect for late-night telling around campfires.",
+    more: "Modern accounts sometimes involve headlights catching the glint of reflective eyes and then nothing more; the swamp’s low, rich soil has always been fertile ground for tales of lurking things."
+  },
+
+  "Florida": {
+    name: "Skunk Ape",
+    region: "Everglades and Florida swamps",
+    short: "Bigfoot-like but smellier — Florida’s famous hairy biped.",
+    desc: "Florida’s Skunk Ape is the Southeast’s answer to Sasquatch: a bulky, bipedal creature covered in matted brown hair and often accompanied by an unmistakable, foul odor. Sightings cluster in the dense, watery thickets of the Everglades where dry land and swamp meet. Witnesses report broken tents, vanished pets, and large, humanlike prints that defy easy explanation in muddy soil.",
+    more: "The Skunk Ape blends natural history and tourism: swamp tours sometimes include references to the creature, and a few hoaxed photos exist — yet the combination of dense terrain and long-standing local anecdotes keeps the mystery alive."
+  },
+
+  "Georgia": {
+    name: "Altamaha-ha (Altie)",
+    region: "Altamaha River, coastal Georgia",
+    short: "River monster with smooth, snakelike body and flippers.",
+    desc: "Altamaha-ha — affectionately called 'Altie' by some locals — is a long, serpentine being said to glide through the muted waters of the Altamaha River. Descriptions vary between a long-necked animal and an undulating, flippered serpent that surfaces with a low, wet sound. Fishermen and river pilots sometimes report odd wakes, sudden disturbances, and the occasional sighting of a dark form slipping between river islands.",
+    more: "Because the Altamaha watershed is biologically rich and relatively opaque, odd sightings can be read as large fish, manatee relatives, or something older; in local lore, Altie connects the human community to the river’s deeper natural history."
+  },
+
+  "Hawaii": {
+    name: "Menehune",
+    region: "Small islands and forests",
+    short: "Little people who build things at night and disappear by day.",
+    desc: "Menehune are legendary small folk in Hawaiian tradition, famed for crafting fishponds, temples, and remarkable stonework under cover of night. They are mischievous but skilled, and stories tell of entire structures built in a single night by these quick, hidden hands. Menehune belong more to myth and island culture than to roadside cryptid sightings, but their presence in local storytelling has the same function as other cryptic beings: accounting for the unexplained and teaching respect for place.",
+    more: "Visitors often encounter stories of specific sites attributed to Menehune workmanship; these tales sit at the junction of folklore, cultural identity, and the supernatural."
+  },
+
+  "Idaho": {
+    name: "Sharlie",
+    region: "Payette Lake and other mountain lakes",
+    short: "A serpentine lake monster said to glide through cold water.",
+    desc: "Sharlie is Idaho’s long-ranked water cryptid, rumored to inhabit Payette Lake with a sweeping, sinuous body and a habit of surfacing to leave ripples and scattered logs in its wake. The creature’s name evokes old-time fishing tales: late-night campfire stories of a shadow seen under the surface or a head glimpsed between waves. Locals alternate between teasing tourists and insisting they’ve seen something too large for ordinary fish.",
+    more: "Sharlie’s lore overlaps with global lake monster traditions: a little unexplained patience on deep, cold lakes is enough to spawn a lasting legend."
+  },
+
+  "Illinois": {
+    name: "Chicago Mothman (Owlman variants)",
+    region: "Chicago metropolitan and surrounding woods",
+    short: "Winged humanoid sightings echoing the West Virginia Mothman.",
+    desc: "Illinois reports of winged humanoids — sometimes called local 'Mothman' or 'Owlman' — surfaced periodically around bridges, abandoned industrial sites, and dimly lit highways. Witnesses often describe a tall, shadowy figure with glowing eyes and powerful wings, producing a sense of dread before or after alleged disasters. Though less famous than West Virginia’s original, the Chicago-area sightings show how the Mothman motif migrated with modern urban anxieties.",
+    more: "These reports intersect with changes in industrial landscapes: abandoned buildings and noisy bridges create eerie backdrops that encourage the imagination to pattern events as ominous visitations."
+  },
+
+  "Indiana": {
+    name: "Beast of Busco",
+    region: "Frog Lake / Churubusco",
+    short: "A gargantuan snapping turtle said to live in a local lake.",
+    desc: "The Beast of Busco is a Midwest oddity: a rumored enormous turtle that allegedly haunted the waters near Churubusco for decades. Size estimates range wildly, but the core image is unforgettable — a shell the size of a truck and an animal so large it changes local fishing lore. Farmers and children grew up with tales of nets snagged on something heavy beneath the surface and an animal that refused the normal expectations of pond life.",
+    more: "Though the Beast likely grew from tall-tale exaggeration and misidentifications, it remains a whimsical and tenacious part of Indiana’s cryptid catalog."
+  },
+
+  "Iowa": {
+    name: "Van Meter Visitor",
+    region: "Van Meter, early 1900s location",
+    short: "A horned, luminous flying humanoid first witnessed in 1903.",
+    desc: "The Van Meter Visitor made headlines in 1903: townsfolk described a winged, glowing figure with a single horn that emitted light, moving low over roofs and causing panic and wonder. The Visitor was pursued with bullets (to no effect) and left charred marks and unsettled townspeople in its wake. Over time the story became part folklore, part early-modern mystery — its combination of aviation-like movement and monstrous description fits the strangeness of an era when old traditions met modern technology.",
+    more: "Modern retellings place it in the context of atmospheric phenomena and social hysteria, but the original reports retain the uncanny clarity of eyewitness testimony."
+  },
+
+  "Kansas": {
+    name: "Sinkhole Sam",
+    region: "Inman Lake and central Kansas",
+    short: "A serpentine, eel-like creature rumored to live in a sinkhole lake.",
+    desc: "Sinkhole Sam is a prairie anomaly: a long, eel-like animal said to lurk in a small, bottomless lake left by tectonic quirks and human mining. Stories tell of fishermen feeling sudden tugs, of water spirals appearing with no obvious cause. With Kansas’ flat horizon, the existence of a hidden, deep water hole capable of hiding something large sparks imagination and steers jokes into uneasy concern.",
+    more: "Folklore suggests Sam is a remnant of older waters or an animal that found refuge in a shadowy pocket of the plains ecosystem."
+  },
+
+  "Kentucky": {
+    name: "Hopkinsville Goblins",
+    region: "Hopkinsville encounter area (1955)",
+    short: "Small, metallic-skinned beings in one of the most famous close-encounter cases.",
+    desc: "The Hopkinsville encounter is a cornerstone of American UFO and cryptid lore: multiple witnesses reported small, bright-eyed, thin-limbed beings approaching a farmhouse and performing bizarre behaviors. Descriptions of the creatures — metallic skin, large eyes, and an unearthly gait — were coupled with dramatic physical reaction accounts and a swarm of local and national attention. Whether read as alien visitation, misidentified animals, or a cultural phenomenon, the Hopkinville story permanently married cryptid and UFO myth.",
+    more: "The incident’s detail and multiplicity of witnesses make it one of the most resilient and discussed cases in the field of anomalous reports."
+  },
+
+  "Louisiana": {
+    name: "Rougarou",
+    region: "Cajun swamps and bayous",
+    short: "A werewolf-like creature tied to Cajun folktales and moral warnings.",
+    desc: "The Rougarou stalks the Cajun backwoods as both monster and social lesson: some versions cast it as a werewolf, others as a human cursed for breaking fasts or taboos. Sightings claim a bipedal, furtive creature with wolfish attributes slinking between moss-draped cypress and abandoned plantations. Stories are often used to keep children indoors or to explain animal predation on livestock, but the Rougarou’s cultural power comes from its link to identity, language, and the tensions of swamp life.",
+    more: "Rougarou tales are woven into Mardi Gras season lore and local storytelling, where monstrous transformation is as much moral allegory as cryptid spectacle."
+  },
+
+  "Maine": {
+    name: "Pukwudgie",
+    region: "Wabanaki forested lands",
+    short: "Small, tricky forest spirits that can be dangerous.",
+    desc: "Pukwudgies are curious and sometimes malevolent little people from Wabanaki tradition: small, grey-skinned beings capable of magic and mischief. Tales speak of them luring hunters, playing cruel tricks, or retaliating when offended. Their presence in New England stories preserves indigenous folklore and warns of the hazards of disrespecting the land and its hidden presences.",
+    more: "Modern sightings are rare and often recounted by those familiar with traditional stories; pukwudgies occupy a liminal role between helpful spirit and dangerous trickster."
+  },
+
+  "Maryland": {
+    name: "Chessie",
+    region: "Chesapeake Bay",
+    short: "A long, serpentine sea serpent said to inhabit the bay.",
+    desc: "Chessie is the Chesapeake Bay’s long-lived water cryptid, reportedly seen as a series of humps or a long, snake-like head bobbing in the bay’s shallow expanse. Fishermen and bay pilots have told of unusual wakes and solid lumps that move far too deliberately for ordinary marine life. Chessie’s legend has become a regional mascot of sorts: cautionary and whimsical, it connects the bay’s working communities to an older tradition of 'water stories'.",
+    more: "Explanations range from large sturgeon to shared perception error; nevertheless, the image of Chessie is persistent and beloved by many locals."
+  },
+
+  "Massachusetts": {
+    name: "Dover Demon",
+    region: "Dover and surrounding suburbs",
+    short: "Pale, long-limbed humanoid with large orange eyes, first seen in 1977.",
+    desc: "The Dover Demon is a strikingly odd figure: a small, pale humanoid with enormous, orange-staring eyes and spindly arms, reported by multiple teenagers in a concentrated series of sightings. Its quick, silent movement and total lack of aggression made it more eerie than terrifying, appearing as a sharp, inexplicable moment in suburban life. The Demon’s single-season burst of reports gave it a focused mystique that resists easy categorization.",
+    more: "Even decades later, the memory of those nights remains vivid in local retellings, preserving the sense of a fleeting, intimate encounter with something other."
+  },
+
+  "Michigan": {
+    name: "Dogman",
+    region: "Forests and rural regions across the state",
+    short: "A wolf-headed, human-bodied creature blamed for attacks and howls.",
+    desc: "Michigan’s Dogman is a powerful, wolf-headed biped that stalks rural roads and deep woodlands, often reported in the moonlight with bloodcurdling howls. Stories include sightings of reflective eyes, tracks with unusual proportions, and animals responding with fear in its presence. The Dogman blends pack-animal ferocity with a humanlike uprightness, making it especially unnerving as a cryptid that seems to bridge carnivore and person.",
+    more: "While hoaxes exist, ongoing anecdotal reports and the creature’s rooted place in local storytelling give the Dogman staying power among northern cryptid traditions."
+  },
+
+  "Minnesota": {
+    name: "Wendigo",
+    region: "Northern woods and Ojibwe stories",
+    short: "A cannibalistic winter spirit from Algonquian traditions.",
+    desc: "The Wendigo is a terrifying entity rooted in Ojibwe and Algonquian myth: an emaciated, monstrous spirit associated with greed, starvation, and the horrors of winter isolation. Described as gaunt and ravenous, the Wendigo embodies the psychological extremes of being trapped in a frozen wilderness with dwindling supplies. Stories served as both literal admonitions and cultural teachings about sharing and community during harsh seasons.",
+    more: "Modern 'sightings' often conflate psychological horror and folklore; the Wendigo endures as a deep cultural figure rather than a simple roadside cryptid."
+  },
+
+  "Mississippi": {
+    name: "Pascagoula River Aliens",
+    region: "Pascagoula River, 1973 incident",
+    short: "Two men reported being abducted by robotic, clawed entities.",
+    desc: "The Pascagoula case is one of the more dramatic Southern contact narratives: in 1973 two men claimed that metallic, crab-like beings with hooks abducted them from a boat at night and performed examinations. Their story gained immediate attention due to the men’s calm, detailed testimony and the lack of clear motive for fabrication. Whether interpreted as a UFO encounter, mass misperception, or a modern folklore incident, the story has become a spine-tingling chapter in Mississippi lore.",
+    more: "The incident left no obvious physical trace, but the sighting’s vividness — including the description of the beings’ mechanical arms — makes it linger in local memory."
+  },
+
+  "Missouri": {
+    name: "Momo (Missouri Monster)",
+    region: "Piney woods and rural counties",
+    short: "Bigfoot-like creature with a foul stench and nocturnal prowling.",
+    desc: "Momo is Missouri’s own Sasquatch legend: a hairy, humanlike creature blamed for livestock losses and chilling night calls. Sightings describe a large, thickset animal that showers the area with an unpleasant odor and vanishes into the timber with unnatural speed. Momo’s presence is part of a larger pattern of midwestern cryptid lore connecting long-standing oral reports to modern sightings and occasional footprint casts.",
+    more: "Festivals and local legend-keeping help Momo maintain a paradoxical local reputation — equal parts tourist draw and uneasy belief."
+  },
+
+  "Montana": {
+    name: "Shunka Warakin",
+    region: "Frontier reports, Plains and mountains",
+    short: "Hyena-like predator reported by 19th century settlers and natives.",
+    desc: "The Shunka Warakin appears in frontier-era reports as a hyena-like creature glimpsed on the plains and in broken timber: a predatory, dog-sized animal with an uncanny set of habits and a reputation for attacking livestock. Early naturalists and frontiersmen debated its identity, and stories shifted between misidentified wolves, escaped exotic animals, and genuine cryptid possibility. As settlement expanded, Shunka Warakin stories absorbed elements of fear about the unknown margins of new settlements.",
+    more: "Today it exists in Montana lore as an example of the weird fauna frontier communities told to make sense of predation they couldn’t neatly explain."
+  },
+
+  "Nebraska": {
+    name: "Alkali Lake Monster",
+    region: "Remote prairie lakes and sink basins",
+    short: "A large aquatic reptile reported in small, isolated lakes.",
+    desc: "In Nebraska, tales of an Alkali Lake Monster crop up around deep sink lakes and prairie holes with sudden currents and weird sounds. The creature is spoken of as an oversized reptile or piscine predator that can surprise fishermen with violent underwater movement. Stories grow in places where a deep water body seems anomalous in the otherwise flat landscape, and the unknown depth breeds speculation.",
+    more: "While no hard evidence exists, the Alkali Lake Monster ties into the landscape’s geologic quirks and the human tendency to fill deep water with a narrative occupant."
+  },
+
+  "Nevada": {
+    name: "Tahoe Tessie",
+    region: "Lake Tahoe",
+    short: "Classic lake serpent rumors in Tahoe’s clear, cold waters.",
+    desc: "Tahoe Tessie is Lake Tahoe’s version of a water cryptid — glimpsed as a long, serpentine form slipping under the lake’s glassy surface or as repeated strange wakes at dawn. The lake’s vast depth and mountain isolation have made it a natural candidate for long-running monster lore. Cabin goers and boaters report a sense of presence rather than clear shapes: a disturbance, a large wake, and then smooth, inscrutable water.",
+    more: "The clean, alpine water and tourist culture give Tessie stories a particular echo — perfect for lakeside campfire retellings and postcard curiosity."
+  },
+
+  "New Hampshire": {
+    name: "Wood Devils",
+    region: "Deep woodlands and old-growth stands",
+    short: "Tall, thin grey figures that hide behind trees and watch travelers.",
+    desc: "Wood Devils are described as lanky, grey beings that keep to the shadows of New Hampshire’s old woods, peering from behind trunks and branches with an unsettling patience. They are less aggressive and more voyeuristic — the terror comes from being observed by something utterly alien. Hikers and late-night drivers sometimes report a chill of awareness and an unsettling silhouette slipping between trees.",
+    more: "These stories feel like a modern reflex to the vastness of Northeastern woodlands: symbols of the unknown that lurks beyond familiar trails."
+  },
+
+  "New Jersey": {
+    name: "Jersey Devil",
+    region: "Pine Barrens",
+    short: "Hooved, winged creature of the Pine Barrens with a long history.",
+    desc: "The Jersey Devil is the Pine Barrens’ most famous monster: described in countless versions as a winged, hoofed abomination with a goat- or horse-like head and a shriek that chills rural communities. The creature’s myth stretches back centuries and was a prominent part of 18th and 19th-century news accounts; it supposedly haunts remote parts of the Barrens, where sandy soil and dense cedar make for strange echoes and hidden hollows. Sightings range from feral animals to supernatural demons — but the legend endures.",
+    more: "Because the Pine Barrens are sparsely settled and richly leafed, it’s unsurprising that a creature like the Jersey Devil found a firm home in regional imagination and seasonal folklore."
+  },
+
+  "New Mexico": {
+    name: "Skinwalker",
+    region: "Navajo country and high desert",
+    short: "A shapeshifting witch from Navajo tradition, often dangerous.",
+    desc: "Skinwalkers belong to Navajo belief systems as powerful, dangerous beings who can take on the form of animals or other humans. Stories emphasize the moral and spiritual hazard of invoking or confronting them; they’re rarely treated as quaint campfire fodder. Accounts range from uncanny animal behavior to alleged close encounters that cause fear and social distress in communities where the tradition remains alive and meaningful.",
+    more: "Because Skinwalker lore is entwined with sacred beliefs, it’s treated with respect and caution by those who hold the stories; outsiders are urged to listen rather than appropriate the narrative."
+  },
+
+  "New York": {
+    name: "Champ",
+    region: "Lake Champlain",
+    short: "Lake Champlain’s famous long-necked creature, seen for centuries.",
+    desc: "Champ — the long-necked denizen of Lake Champlain — has been part of regional accounts since Native American stories and later colonial reports. Witnesses describe a creature resembling the classic plesiosaur image: a loping, hump-backed form with a long neck that surfaces and slips away. Champ has become a beloved local emblem, with festivals, searches, and serious and lighthearted investigation alike.",
+    more: "Champ’s appeal combines the romance of a living relic with the mystery of a large, sparsely observed lake; it’s as much a local mascot as a cryptid."
+  },
+
+  "North Carolina": {
+    name: "Beast of Bladenboro",
+    region: "Bladenboro and surrounding rural counties",
+    short: "Catlike predator blamed for brutal livestock attacks in the 1950s.",
+    desc: "The Beast of Bladenboro terrorized farms in late 1950s North Carolina, reportedly killing sheep and other small stock in savage, inexplicable ways. Witnesses found bodies drained of blood and carcasses mutilated, which fueled intense local fear and hunting efforts. Descriptions toggled between an oversized wild dog, a panther, or an unknown carnivore with uncanny strength and stealth.",
+    more: "The episode remains a vivid chapter in local history — a moment when agricultural communities confronted an animal threat that didn’t fit neat categories."
+  },
+
+  "North Dakota": {
+    name: "Thunderbird",
+    region: "Wide plains and lake regions",
+    short: "Giant winged birds capable of creating storms in some tales.",
+    desc: "Thunderbird is an ancient Native American motif adopted into modern cryptid sightings: enormous birds whose wings beat up storms and whose size dwarfs any known avian species. Reports sometimes mention huge winged shadows crossing highways or coastal cliffs, and Native tales place thunderbirds in cosmological roles tied to weather and balance. Modern sightings tend to be fragments — a great shadow, a thunderous wind, and then a sky cleared of details.",
+    more: "The Thunderbird idea is a cultural bridge, mixing indigenous cosmology with present-day anomalous reports and a human love for the spectacular."
+  },
+
+  "Ohio": {
+    name: "Loveland Frogman",
+    region: "Loveland and surrounding river corridors",
+    short: "A humanoid frog creature spotted near riverbanks, sometimes with a wand.",
+    desc: "The Loveland Frogman is a quirky, unsettling sighting: humanoid, frog-like figures seen near rivers and bridges, occasionally described as carrying small wands or tools. The 1970s sightings that popularized the creature included police officers and motorists, mixing official, baffled accounts with the cartoonish image of a frog-man standing on a roadside. Whether a misidentified animal, prank, or an emblem of local color, the Frogman remains a favorite oddity of Ohio folklore.",
+    more: "Kids’ books and local souvenirs have embraced the Frogman’s image, turning a strange report into cultural charm."
+  },
+
+  "Oklahoma": {
+    name: "Ouachita Bigfoot",
+    region: "Ouachita mountains and forested areas",
+    short: "Regional Bigfoot sightings and even an annual celebration.",
+    desc: "Oklahoma’s Ouachita range has its share of Bigfoot lore: large, hairy bipeds glimpsed at the edges of campsites and along back-country roads. Reports mention characteristic footprints and distant vocalizations, and the creature’s presence is often folded into community events and festivals that celebrate the region’s mysterious heritage. As elsewhere, the line between folklore and local economy is thin: Bigfoot brings both belief and branding.",
+    more: "The Ouachita Bigfoot is a regional variant with local flavor — in stories, in crafts, and in the sense that remote woodlands feel alive with unconfirmed residents."
+  },
+
+  "Oregon": {
+    name: "Sasquatch",
+    region: "Pacific Northwest temperate rainforests",
+    short: "The classic Bigfoot — tall, hairy, and deeply rooted in the region.",
+    desc: "Oregon is quintessential Sasquatch country: dense old-growth forests, heavy rainfall, and a cultural readiness to believe in a large, reclusive biped. Sightings include distant calls, footprints that resist simple explanation, and occasional blurry photos or videos that fuel endless debate. Sasquatch functions as a symbol of wilderness autonomy — something deliberately outside human domains.",
+    more: "The lore is old and varied: indigenous stories of wild men meet modern sightings and entrepreneurial festivals celebrating the monster’s mythic resonance."
+  },
+
+  "Pennsylvania": {
+    name: "Squonk",
+    region: "Northern glens and hemlock stands",
+    short: "A sad, ulcerated creature that allegedly dissolves into tears when captured.",
+    desc: "The Squonk is a uniquely melancholy cryptid: small, warty, and perpetually ashamed of its own appearance, it is said to dissolve into a pool of tears when cornered. The creature’s story is more fable than sighting — a moral parable about vanity and misery wrapped in a local oddity. The image of a creature too sorrowful to survive capture is potent, and its charm comes from humor mixed with compassion.",
+    more: "Squonk tales are often told with a wink, preserving a literary flavor alongside the geography of Pennsylvania’s quiet woodlands."
+  },
+
+  "Rhode Island": {
+    name: "Palatine Light",
+    region: "Block Island and coastal waters",
+    short: "A ghostly, burning ship or light said to appear off the coast.",
+    desc: "The Palatine Light is not a creature but a spectral maritime phenomenon: a ghostly burning ship or a strange, glowing point off the Rhode Island coast that appears on foggy nights. Stories mix a vanished immigrant ship tragedy with lanterns seen bobbing just beyond waves, evoking sailors’ superstitions and coastal mourning. The light’s memory is kept alive by fishermen and islanders as a haunting, oceanic curiosity.",
+    more: "Such coastal anomalies tie the community to persistent maritime myth and the image of unresolved loss on the sea."
+  },
+
+  "South Carolina": {
+    name: "Lizard Man of Scape Ore Swamp",
+    region: "Lee County / Scape Ore Swamp",
+    short: "Reptilian humanoid blamed for car attacks and livestock scares.",
+    desc: "The Lizard Man emerged into national consciousness in the late 1980s after reports of a scaled, humanoid figure attacking a car and leaving deep, three-toed footprints behind. Descriptions emphasize greenish scales, a powerful, muscular build, and a startling speed that allowed it to vanish into swampy brush. Local sensational newspapers and late-night hosts seized the tale, but the Lizard Man kept returning in sporadic sightings and eerie footprints.",
+    more: "The creature’s story reflects a swamp geography that fosters ambiguous sightings and the media economy that magnifies them into sustained legend."
+  },
+
+  "South Dakota": {
+    name: "Taku-He",
+    region: "Black Hills and forest margins",
+    short: "A large, hairy hominid reported in forested pockets.",
+    desc: "The Taku-He is a regional hairy hominid, with occasional sightings reported in forested enclaves and near remote trails. Witness accounts vary, but the creature’s persistence in stories gives it a solid place in local cryptozoology. As with other forest-dwelling cryptids, the Taku-He is a narrative helper for explaining unexpected sounds, missing game, and the sense that wild places have a life of their own.",
+    more: "Folklore surrounding Taku-He adds texture to the experience of hiking and hunting in sparsely populated natural spaces."
+  },
+
+  "Tennessee": {
+    name: "White Bluff Screamer",
+    region: "White Bluff and Cumberland Plateau",
+    short: "A paralyzing, inhuman scream heard in secluded gorges.",
+    desc: "The White Bluff Screamer is remembered mostly for the sound — a high, unnatural shriek that cuts through canyon air and leaves listeners shaken. Sightings are rare; the real terror is auditory: an inhuman cry that doesn’t match any known animal. Local retellings attach the scream to a bipedal shadow seen fleetingly at cliff edges or to an event that leaves dogs howling for hours.",
+    more: "The Screamer’s compelling detail is its emphasis on sound as supernatural evidence, a reminder that not all strange encounters require a visual confirmation."
+  },
+
+  "Texas": {
+    name: "Chupacabra",
+    region: "South Texas and borderlands",
+    short: "A blood-draining predator blamed for livestock deaths.",
+    desc: "In Texas, the Chupacabra is often described as a hairless, canine-like creature with pronounced fangs and vampiric tendencies, attacking animals and leaving carcasses strangely drained. The phenomenon’s 1990s eruption mixed alien abduction tropes, biological disease theories, and rural fear, producing a creature with mutable appearance and a persistent reputation. Whether coyotes with mange or something stranger, the Chupacabra fits cultural anxieties about disease, borders, and the unknown.",
+    more: "The Chupacabra’s legend is flexible — morphing to fit local details and feeding an economy of paranoia and internet speculation."
+  },
+
+  "Utah": {
+    name: "Bear Lake Monster",
+    region: "Bear Lake, Utah-Idaho border",
+    short: "Serpentine lake creature reported along the deep lake’s shorelines.",
+    desc: "The Bear Lake Monster is a regional water cryptid reported as a large, dark figure slipping just below the surface of the clear, cold lake. Sightings include long, sinuous wakes and occasional glimpses of a head or hump. The lake’s clarity and tourist traffic mean that purported encounters spread quickly, and the Monster lives in local lore and postcards as an alluring mystery.",
+    more: "Bear Lake’s combination of deep water and recreational culture makes it an ideal setting for a charismatic lake beast."
+  },
+
+  "Vermont": {
+    name: "Northfield Pigman",
+    region: "Northfield and central Vermont",
+    short: "Humanoid with a pig-like face sighted in the 1970s.",
+    desc: "The Northfield Pigman is a strange, unsettling report from the 1970s: a bipedal figure with porcine features seen on rural roads and near farmsteads. Descriptions emphasize a porcine snout, suspiciously human posture, and an unnerving stillness that makes onlookers feel watched. The story lives on in local campfire retellings and occasional late-night radio nostalgia segments.",
+    more: "Whether an escaped exotic or a misinterpreted animal, the Pigman is a memorable piece of Vermont oddness."
+  },
+
+  "Virginia": {
+    name: "Snallygaster",
+    region: "Shenandoah Valley and central Virginia",
+    short: "A dragon-bird hybrid with metallic beak and tentacles in older accounts.",
+    desc: "The Snallygaster is a dragon-like beast reportedly seen flying low over farms, snatching livestock, and terrifying 18th- and 19th-century communities. Early German settlers contributed to the creature’s texture, mixing Old World fear with new-world wilderness. Sightings described a leathery-winged monster with a beak of steel and sometimes tentacles — a monstrous aerial predator that unified disparate rural accounts into a terrifying motif.",
+    more: "Modern mentions are rarer, but the Snallygaster remains a vivid example of how immigrant stories can mutate into distinct American monstrous forms."
+  },
+
+  "Washington": {
+    name: "Bigfoot",
+    region: "Olympic Peninsula and Cascades",
+    short: "Iconic Pacific Northwest Sasquatch — large, hairy, and elusive.",
+    desc: "Washington is the default home of Bigfoot: thick rainforests, steep mountains, and centuries of indigenous stories about wild men that predate modern sightings. Reported characteristics include a heavy, musky odor, enormous footprints, and long, echoing calls that reverberate through old-growth stands. Bigfoot is part cryptid, part cultural emblem: photo ops, festivals, and camps for enthusiasts sit alongside serious fieldwork by some investigators.",
+    more: "The creature remains the Pacific Northwest’s most famous unknown resident and a symbol of the tension between wilderness preservation and human curiosity."
+  },
+
+  "West Virginia": {
+    name: "Mothman",
+    region: "Point Pleasant and river bridges",
+    short: "Winged humanoid with glowing red eyes and apocalyptic associations.",
+    desc: "Mothman is the archetypal modern cryptid: a winged, humanoid figure with fiery red eyes first reported en masse in Point Pleasant in the 1960s. The creature’s association with the catastrophic collapse of the Silver Bridge in 1967 cemented its apocalyptic mystique. Witnesses reported a sense of unease, odd dreams, and the presence of government interest; the legend spawned festivals, books, and the cult-classic film 'The Mothman Prophecies.'",
+    more: "Mothman blends prophecy, tragedy, and eerie sightings into a narrative that persists in the American mythscape."
+  },
+
+  "Wisconsin": {
+    name: "Beast of Bray Road",
+    region: "Elkhorn and rural Walworth County",
+    short: "Werewolf-like creature stalking rural roads and farms.",
+    desc: "The Beast of Bray Road rose to prominence in the late 1980s and 1990s when motorists and residents began reporting a hulking, wolfish creature walking near roads and peering at homes. Descriptions range from large canid to humanoid wolf-figure, often with a human gait and terrifying presence. The Beast’s notoriety grew through local news, talk shows, and a notorious book that merged eyewitness testimony with speculation.",
+    more: "Whether a misidentified wolf, a hoax, or something stranger, the Beast captures the primal fear of a predator at the edge of suburban life."
+  },
+
+  "Wyoming": {
+    name: "Jackalope",
+    region: "Frontier high plains and barroom tall tales",
+    short: "Horned rabbit — a jocular creature of hunting lore and whimsy.",
+    desc: "The Jackalope is the cheeky side of cryptid culture: a rabbit with antelope horns that lives in the tall grasses of the high plains, famous for appearing in postcards, taxidermy jokes, and barroom lore. Stories claim the Jackalope can imitate human voices and is dangerous to hunt without care, but the tone is usually jokey and celebratory rather than terrifying. The creature is an example of how humor and frontier imagination produce enduring folkloric icons.",
+    more: "Jackalope souvenirs and roadside attractions keep the myth alive as a beloved, unserious American oddity."
+  }
+};
+
+/* ---------- Helper: state code list for grid layout (50 tiles) ---------- */
+const states = [
+  "Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia",
+  "Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland",
+  "Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey",
+  "New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina",
+  "South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"
+];
+
+/* postal abbreviations for display */
+const abbrev = {
+  "Alabama":"AL","Alaska":"AK","Arizona":"AZ","Arkansas":"AR","California":"CA","Colorado":"CO","Connecticut":"CT","Delaware":"DE",
+  "Florida":"FL","Georgia":"GA","Hawaii":"HI","Idaho":"ID","Illinois":"IL","Indiana":"IN","Iowa":"IA","Kansas":"KS","Kentucky":"KY",
+  "Louisiana":"LA","Maine":"ME","Maryland":"MD","Massachusetts":"MA","Michigan":"MI","Minnesota":"MN","Mississippi":"MS","Missouri":"MO",
+  "Montana":"MT","Nebraska":"NE","Nevada":"NV","New Hampshire":"NH","New Jersey":"NJ","New Mexico":"NM","New York":"NY","North Carolina":"NC",
+  "North Dakota":"ND","Ohio":"OH","Oklahoma":"OK","Oregon":"OR","Pennsylvania":"PA","Rhode Island":"RI","South Carolina":"SC","South Dakota":"SD",
+  "Tennessee":"TN","Texas":"TX","Utah":"UT","Vermont":"VT","Virginia":"VA","Washington":"WA","West Virginia":"WV","Wisconsin":"WI","Wyoming":"WY"
+};
+
+/* render the grid */
+const grid = document.getElementById('grid');
+states.forEach(state=>{
+  const tile = document.createElement('button');
+  tile.className = 'state';
+  tile.setAttribute('data-state', state);
+  tile.innerHTML = `<div class="abbr">${abbrev[state]}</div><div class="stname">${state}</div>`;
+  tile.onclick = () => showState(state, tile);
+  tile.onkeydown = (e)=> { if(e.key === 'Enter') showState(state, tile); };
+  grid.appendChild(tile);
+});
+
+/* show details for state */
+function showState(state, tileEl){
+  // highlight
+  document.querySelectorAll('.state').forEach(s=>s.classList.remove('active'));
+  tileEl.classList.add('active');
+
+  const info = cryptids[state];
+  const detail = document.getElementById('detail');
+  if(!info){
+    detail.innerHTML = `<div class="cryptid-title"><h2>Nothing here</h2></div><div class="meta">${state}</div><div class="desc">No data for ${state}.</div>`;
+    return;
+  }
+
+  detail.innerHTML = `
+    <div class="cryptid-title">
+      <h2>${escapeHtml(info.name)}</h2>
+    </div>
+    <div class="meta">${escapeHtml(state)} · ${escapeHtml(info.region)} </div>
+    <div class="desc"><strong>${escapeHtml(info.short)}</strong><p style="margin-top:8px">${escapeHtml(info.desc)}</p><p style="margin-top:8px;color:#cfeeff">${escapeHtml(info.more)}</p></div>
+  `;
+
+  // accessibility: move focus to detail
+  detail.setAttribute('tabindex','-1');
+  detail.focus();
+}
+
+/* small html escape */
+function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
+
+</script>
+</body>
+</html>
